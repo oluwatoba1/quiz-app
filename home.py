@@ -35,7 +35,7 @@ class Home:
             item.pack_forget()
         # self._window = Tk(className="QUIZZER")
 
-    def initialize(self, rebuild=False, window_size="400x400"):
+    def initialize(self, rebuild=False, window_size="550x500"):
         if rebuild:
             self.rebuild()
 

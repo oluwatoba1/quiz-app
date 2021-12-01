@@ -58,10 +58,11 @@ class Question(Home):
     mc = None
     module = None
     qz = None
+
     def show_section(self, mc, qz):
         self.initialize(rebuild=True)
         self.mc = mc
-        self.qz  = qz
+        self.qz = qz
         options = [
             {"text": "Create Question", "command": self.add_or_update_question},
             {"text": "Update Question", "command": self.show_modules},
@@ -107,14 +108,14 @@ class Question(Home):
             self.ent_answer3.grid_remove()
             self.ent_answer4.grid_remove()
             self.option_answer.grid(row=7, column=1, pady=(0, 10), sticky="e")
-            
+
         else:
             self.ent_answer2.grid_remove()
             self.ent_answer3.grid_remove()
             self.ent_answer4.grid_remove()
             self.option_answer.grid_remove()
 
-        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+        self.canvas.configure(scrollregion=(0, 0, 550, 550))
 
     def add_or_update_question(self, question=None):
         save_command = self.save
@@ -145,33 +146,31 @@ class Question(Home):
             # self.canvas.pack(expand=True)
             # self.scrollbar.config(command=self.canvas.yview)
 
-            frame = Frame(self.get_window())
+            frame = Frame(self.get_window(), bg="#FAFAFA")
 
-            self.canvas = Canvas(frame, height = 500,width =500)
-            self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+            self.canvas = Canvas(frame, bg="#FAFAFA", height=500, width=500)
+            self.canvas.configure(scrollregion=(0, 0, 550, 550))
+            canvas_frame = Frame(self.canvas, bg="#FAFAFA")
+            self.canvas.create_window(
+                (0, 0), window=canvas_frame, anchor="nw", tags="frame"
+            )
 
-            scrollbar = Scrollbar(frame ,orient="vertical", command=self.canvas.yview)
+            scrollbar = Scrollbar(frame, orient="vertical", command=self.canvas.yview)
             self.canvas.configure(yscrollcommand=scrollbar.set)
 
             scrollbar.pack(side="right", fill="y")
-            self.canvas.pack(side = BOTTOM, anchor = NW,fill="x")
+            self.canvas.pack(side=BOTTOM, anchor=NW, fill="both", expand=True)
             frame.pack(anchor=W, fill="x")
 
             # self.canvas.create_line(0, 0, 500, 1000)
             # self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
-            
-
-            Label(master=self.canvas, text=text, foreground="black", font=("Arial", 16)).pack()
-            self.form_group = Frame(
-                self.canvas, pady=10, padx=10, bg="#FAFAFA"
-            )
-            form_action = Frame(
-                self.canvas, pady=10, padx=10, bg="#FAFAFA"
-            )
-            form_notify = Frame(
-                self.canvas, pady=10, padx=10, bg="#FAFAFA"
-            )
+            Label(
+                master=canvas_frame, text=text, foreground="black", font=("Arial", 16)
+            ).pack()
+            self.form_group = Frame(canvas_frame, pady=10, padx=10, bg="#FAFAFA")
+            form_action = Frame(canvas_frame, pady=10, padx=10, bg="#FAFAFA")
+            form_notify = Frame(canvas_frame, pady=10, padx=10, bg="#FAFAFA")
 
             # Module
             self.module_selected = StringVar(self.form_group)
@@ -313,14 +312,12 @@ class Question(Home):
             btn_back.grid(row=0, column=0, sticky="w")
             btn_save.grid(row=0, column=1, pady=10, sticky="e")
 
-            self.form_group.pack(fill=X)
-            form_action.pack(fill=X)
-            form_notify.pack(fill=X)
+            self.form_group.pack(fill=BOTH)
+            form_action.pack(fill=BOTH)
+            form_notify.pack(fill=BOTH)
             self.lbl_notify.pack()
 
-            self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-
-
+            self.canvas.configure(scrollregion=(0, 0, 550, 550))
 
     def validate_and_save(self, save_data, question_type, questions, q, index):
         message = "Question created successfully!"
