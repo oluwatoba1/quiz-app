@@ -133,19 +133,6 @@ class Question(Home):
                 self.MODULE_OPTIONS[module["name"]] = module["code"]
                 index += 1
 
-            # frame=Frame(self.get_window(), width=100, height=100)
-            # frame.pack()
-
-            # self.canvas=Canvas(self.get_window(), width=100, height=100)
-
-            # self.scrollbar=Scrollbar(self.get_window())
-
-            # # canvas.config(width=400,height=400)
-            # self.scrollbar.pack(side=RIGHT)
-            # self.canvas.config(yscrollcommand=self.scrollbar.set)
-            # self.canvas.pack(expand=True)
-            # self.scrollbar.config(command=self.canvas.yview)
-
             frame = Frame(self.get_window(), bg="#FAFAFA")
 
             self.canvas = Canvas(frame, bg="#FAFAFA", height=500, width=500)
@@ -175,7 +162,7 @@ class Question(Home):
             # Module
             self.module_selected = StringVar(self.form_group)
             self.module_selected.set(self.MODULE_DEFAULT)
-            self.lbl_module = Label(master=self.form_group, text="Module: ", width=15)
+            self.lbl_module = Label(master=self.form_group, text="Module: ", width=20)
             self.option_module = OptionMenu(
                 self.form_group, self.module_selected, *self.MODULE_OPTIONS.keys()
             )
@@ -183,7 +170,7 @@ class Question(Home):
 
             # Question
             self.lbl_question = Label(
-                master=self.form_group, text="Question: ", width=15
+                master=self.form_group, text="Question: ", width=20
             )
             self.txt_question = Text(master=self.form_group, width=40, height=3)
 
@@ -191,7 +178,7 @@ class Question(Home):
             self.type_selected = StringVar(self.form_group)
             self.type_selected.set(self.TYPE_DEFAULT)
             self.lbl_type = Label(
-                master=self.form_group, text="Question Type: ", width=15
+                master=self.form_group, text="Question Type: ", width=20
             )
             self.option_type = OptionMenu(
                 self.form_group,
@@ -203,14 +190,14 @@ class Question(Home):
             self.option_type.configure(width=35)
 
             # Options
-            self.lbl_options = Label(master=self.form_group, text="Options: ", width=15)
+            self.lbl_options = Label(master=self.form_group, text="Options: ", width=20)
             self.ent_option1 = Entry(master=self.form_group, width=40)
             self.ent_option2 = Entry(master=self.form_group, width=40)
             self.ent_option3 = Entry(master=self.form_group, width=40)
             self.ent_option4 = Entry(master=self.form_group, width=40)
 
             # Correct answer
-            self.lbl_answer = Label(master=self.form_group, text="Answer: ", width=15)
+            self.lbl_answer = Label(master=self.form_group, text="Answer: ", width=20)
             self.ent_answer1 = Entry(master=self.form_group, width=40)
             self.ent_answer2 = Entry(master=self.form_group, width=40)
             self.ent_answer3 = Entry(master=self.form_group, width=40)
@@ -226,8 +213,14 @@ class Question(Home):
             self.option_answer.configure(width=35)
 
             # Question score
-            self.lbl_score = Label(master=self.form_group, text="Score: ", width=15)
+            self.lbl_score = Label(master=self.form_group, text="Score: ", width=20)
             self.ent_score = Entry(master=self.form_group, width=40)
+
+            # Answer explanation
+            self.lbl_explanation = Label(
+                master=self.form_group, text="Answer Explanation: ", width=20
+            )
+            self.ent_explanation = Entry(master=self.form_group, width=40)
 
             if question:
                 save_command = lambda: self.save(question["id"])
@@ -309,6 +302,9 @@ class Question(Home):
             self.lbl_score.grid(row=11, column=0, sticky="w")
             self.ent_score.grid(row=11, column=1, pady=10, sticky="e")
 
+            self.lbl_explanation.grid(row=12, column=0, sticky="w")
+            self.ent_explanation.grid(row=12, column=1, pady=10, sticky="e")
+
             btn_back.grid(row=0, column=0, sticky="w")
             btn_save.grid(row=0, column=1, pady=10, sticky="e")
 
@@ -321,7 +317,7 @@ class Question(Home):
 
     def validate_and_save(self, save_data, question_type, questions, q, index):
         message = "Question created successfully!"
-        string_fields = ["module", "question", "question_type", "score"]
+        string_fields = ["module", "question", "question_type", "score", "explanation"]
         list_fields = ["choices", "answers"]
 
         for key in save_data:
@@ -368,6 +364,7 @@ class Question(Home):
                 self.ent_answer3.delete(0, "end")
                 self.ent_answer4.delete(0, "end")
                 self.ent_score.delete(0, "end")
+                self.ent_explanation.delete(0, "end")
             else:
                 message = "Question updated successfully!"
                 questions[index] = save_data
@@ -408,6 +405,7 @@ class Question(Home):
                 answers = [answer for answer in answers if answer.strip()]
 
             question_score = self.ent_score.get()
+            answer_explanation = self.ent_explanation.get()
 
             save_data = {
                 "module": module,
@@ -416,6 +414,7 @@ class Question(Home):
                 "choices": choices,
                 "answers": answers,
                 "score": question_score,
+                "explanation": answer_explanation,
             }
 
             self.validate_and_save(save_data, question_type, questions, q, index)

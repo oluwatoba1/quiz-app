@@ -14,8 +14,14 @@ class Quiz(Home):
     page = 1
     btn_next = None
     btn_submit = None
+    score = 0
+    total_score = 0
+    module = None
+    question = None
 
     def show_quiz_categories(self, module, question):
+        self.module_model = module
+        self.question_model = question
         self.initialize(rebuild=True)
         with open("assets/modules.json", "r+") as m:
             modules = json.load(m)
@@ -144,22 +150,44 @@ class Quiz(Home):
         print(self.answers)
 
     def submit(self):
-        self.initialize(True)
+        self.initialize(True, "600x500")
+        score = self.compute_score()
+
         canvas = Canvas(self.get_window(), bg="#FAFAFA", height=500, width=500)
         canvas.configure(scrollregion=(0, 0, 550, 550))
         canvas_frame = Frame(canvas, bg="#FAFAFA")
-        canvas.create_window((0, 0), window=canvas_frame, anchor="nw", tags="frame")
+        canvas.create_window((0, 0), window=canvas_frame, anchor="nw", tags="result")
 
-        scrollbar = Scrollbar(
-            self.get_window(), orient="vertical", command=canvas.yview
-        )
+        scrollbar = Scrollbar(self.get_window(), command=canvas.yview)
         canvas.configure(yscrollcommand=scrollbar.set)
 
         scrollbar.pack(side="right", fill="y")
-        canvas.pack(side=BOTTOM, anchor=NW, fill="both", expand=True)
+        canvas.pack(side=BOTTOM, anchor=NW, fill="y", expand=True)
+
+        header = Label(
+            canvas_frame,
+            text="Result",
+            foreground="black",
+            font=("Arial", 20),
+        ).pack()
+        header = Label(
+            canvas_frame,
+            text=self.display_result_reaction(),
+            bg="#FAFAFA",
+            foreground="black",
+            font=("Arial", 16),
+        ).pack()
+        result = Label(
+            canvas_frame,
+            text=f"Your score is: {score}",
+            bg="#FAFAFA",
+            foreground="black",
+            font=("Arial", 16),
+        ).pack()
 
         index = 1
         for question in self.session_questions:
+            # Question no#
             Label(
                 master=canvas_frame,
                 text=f"Question {str(index)}",
@@ -167,22 +195,107 @@ class Quiz(Home):
                 font=("Arial", 16),
             ).pack()
 
-            question_group = Frame(master=canvas_frame, pady=20, padx=10, bg="#FAFAFA")
+            # question_group = Frame(master=canvas_frame, pady=20, padx=10, bg="#FAFAFA")
+            # The question itself
             Label(
-                master=question_group,
-                text=self.session_questions[index - 1]["question"],
+                master=canvas_frame,
+                text=question["question"],
                 bg="#FAFAFA",
                 wraplength=500,
                 justify=LEFT,
             ).pack()
 
+            question_type = question["question_type"]
+            choices = question["choices"]
+            answers = self.answers[index - 1]
+
+            # options and user choice(s)
+            generate_quiz_options(
+                canvas_frame,
+                question_type,
+                choices,
+                command=None,
+                disabled=True,
+                answers=answers,
+            )
+
+            # Answer explanation
+            explanation = self.get_explanation(question, answers)
             Label(
-                master=question_group,
-                text=f"Your answer was {self.answers[index - 1][0]}",
+                master=canvas_frame,
+                text=explanation,
                 bg="#FAFAFA",
                 wraplength=500,
                 justify=LEFT,
             ).pack()
-            question_group.pack(fill=X)
+            # question_group.pack(fill=X)
             index += 1
-        canvas.configure(scrollregion=(0, 0, 550, 550))
+
+        # Back button
+        btn_back = Button(
+            master=canvas_frame,
+            text="Back to Home",
+            command=lambda: self.launch(
+                self.module, self.question, self.show_quiz_categories, rebuild=True
+            ),
+        )
+
+        canvas.configure(scrollregion=(0, 0, 1000, 1000))
+
+    def mark_questions(self):
+        index = 0
+        for question in self.session_questions:
+            if (sorted(question["answers"]) == sorted(self.answers[index])) and (
+                len(question["answers"]) == len(self.answers[index])
+            ):
+                self.score += int(question["score"])
+            self.total_score += int(question["score"])
+            index += 1
+
+    def compute_score(self):
+        self.mark_questions()
+
+        return f"{str(self.score)}/{str(self.total_score)}"
+
+    def display_result_reaction(self):
+        comment = ""
+        result_percentage = self.score / self.total_score * 100
+        if result_percentage >= 90:
+            comment = "Awesome!!!!"
+        elif result_percentage >= 80:
+            comment = "Great!!!"
+        elif result_percentage >= 70:
+            comment = "Nice!!"
+        elif result_percentage >= 50:
+            comment = "Not bad!"
+        else:
+            comment = "Eish :("
+
+        return comment
+
+    def get_explanation(self, question, answer):
+        suffix = ""
+        prefix = "Your answer was "
+        is_correct_str = " which is INCORRECT"
+        if len(answer) == 1:
+            suffix = answer[0]
+
+        else:
+            prefix = "Your answers were "
+            for i in range(len(answer)):
+                if i == len(answer) - 1:
+                    suffix += f" and {answer[i]}"
+                    continue
+                elif i == 0:
+                    suffix += f" {answer[i]}"
+                    continue
+                suffix += f", {answer[i]}"
+
+        if (sorted(question["answers"]) == sorted(answer)) and (
+            len(question["answers"]) == len(answer)
+        ):
+            is_correct_str = " which is CORRECT"
+            question["explanation"] = ""
+
+        explanation = prefix + suffix + is_correct_str + ". " + question["explanation"]
+        return explanation
