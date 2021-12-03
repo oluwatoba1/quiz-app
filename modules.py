@@ -16,6 +16,7 @@ class Module(Home):
         =>Update Module
         =>Delete Module
     """
+
     def show_section(self):
         """
         Shows actions users can perform in the module page
@@ -44,9 +45,9 @@ class Module(Home):
 
         return exist
 
-    def add_module(self, *args):
+    def add_module(self, **kwargs):
         """
-            Shows the module form for creation or update
+        Shows the module form for creation or update
         """
         modules = None
         file = None
@@ -76,11 +77,11 @@ class Module(Home):
 
         save = lambda: self.save(ent_code, ent_name, lbl_notify)
 
-        if len(args) > 0:
-            modules = args[0]
-            file = args[1]
-            index = args[2]
-            module = args[3]
+        if len(kwargs) > 0:
+            modules = kwargs["modules"]
+            file = kwargs["file"]
+            index = kwargs["index"]
+            module = kwargs["module"]
             ent_code.insert(0, module["code"])
             ent_name.insert(0, module["name"])
             save = lambda: self.update_module(
@@ -115,7 +116,7 @@ class Module(Home):
 
     def save(self, code, name, notify_label):
         """
-            Save module functionality
+        Save module functionality
         """
         with open("assets/modules.json", "r+") as m:
             modules = json.load(m)
@@ -137,7 +138,7 @@ class Module(Home):
 
     def update_module(self, modules, module, choice, file, notify_label):
         """
-            Update module functionality
+        Update module functionality
         """
         name = module["name"]
         code = module["code"]
@@ -150,7 +151,7 @@ class Module(Home):
 
     def edit_module(self):
         """
-            Shows modules for update
+        Shows modules for update
         """
         with open("assets/modules.json", "r+") as m:
             modules = json.load(m)
@@ -176,7 +177,7 @@ class Module(Home):
 
     def confirmation_page(self, modules, file, choice, module):
         """
-            Popup to confirm deletion of module
+        Popup to confirm deletion of module
         """
         window = Tk(className="Confirmation")
         window.configure(background="#FAFAFA")
@@ -207,7 +208,7 @@ class Module(Home):
 
     def delete(self, window, modules, file, choice, name):
         """
-            Delete functionality
+        Delete functionality
         """
 
         del modules[choice - 1]

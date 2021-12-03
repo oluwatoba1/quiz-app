@@ -263,6 +263,7 @@ class Question(Home):
                     self.tf_answer_selected.set(question["answers"][0])
 
                 self.ent_score.insert(0, question["score"])
+                self.ent_explanation.insert(0, question["explanation"])
 
             # notifier
             self.lbl_notify = Label(

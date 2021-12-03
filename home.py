@@ -4,10 +4,12 @@ import getpass
 
 from tkinter import *
 
+
 class Home:
     """
-        Home/Launch window
+    Home/Launch window
     """
+
     def __init__(self, window):
         self._window = window
         self.label = None
@@ -28,7 +30,7 @@ class Home:
 
     def rebuild(self):
         """
-            clear window and create new content
+        clear window and create new content
         """
         widget_list = self.all_children()
         for item in widget_list:
@@ -43,7 +45,7 @@ class Home:
 
     def launch(self, module, question, quiz, rebuild=False):
         """
-            first method of the application- the launcher method
+        first method of the application- the launcher method
         """
         self.initialize(rebuild)
         options = [
@@ -56,22 +58,37 @@ class Home:
 
     def show_options(self, options, header="WELCOME TO QUIZ MASTER"):
         """
-            Shows list of options for user to select
+        Shows list of options for user to select
         """
-        welcome = Label(text=header, foreground="black", font=("Arial", 16)).pack()
 
         frame = Frame(self._window, relief="sunken", bg="white")
-        frame.pack(fill="both", expand=True, padx=0, pady=10)
+
+        self.canvas = Canvas(frame, bg="#FAFAFA", height=500, width=500)
+        scrollheight = (len(options) + 1) * 50
+        self.canvas.configure(scrollregion=(0, 0, scrollheight, scrollheight))
+        canvas_frame = Frame(self.canvas, bg="#FAFAFA")
+        self.canvas.create_window(
+            (0, 0), window=canvas_frame, anchor="nw", tags="frame"
+        )
+
+        scrollbar = Scrollbar(frame, orient="vertical", command=self.canvas.yview)
+        self.canvas.configure(yscrollcommand=scrollbar.set)
+
+        scrollbar.pack(side="right", fill="y")
+        self.canvas.pack(side=BOTTOM, anchor=NW, fill="both", expand=True)
+
+        frame.pack(anchor=W, fill="both", expand=True, padx=0, pady=10)
 
         for option in options:
             Button(
-                frame,
+                canvas_frame,
                 text=option["text"],
                 width=55,
                 height=2,
                 bg="#333",
                 fg="#FFF",
                 command=option["command"] or self._window.destroy,
+                wraplength=400,
             ).pack()
 
         self._window.mainloop()
