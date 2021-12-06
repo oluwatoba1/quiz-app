@@ -175,7 +175,7 @@ class Module(Home):
                 self.show_section,
             )
 
-    def confirmation_page(self, modules, file, choice, module):
+    def confirmation_page(self, modules, file, index, module, delete=False):
         """
         Popup to confirm deletion of module
         """
@@ -194,7 +194,7 @@ class Module(Home):
         btn_yes = Button(
             master=form_action,
             text="Yes",
-            command=lambda: self.delete(window, modules, file, choice, name),
+            command=lambda: self.delete(window, modules, file, index),
         )
 
         btn_no = Button(master=form_action, text="No", command=window.destroy)
@@ -206,7 +206,7 @@ class Module(Home):
 
         window.mainloop()
 
-    def delete(self, window, modules, file, choice, name):
+    def delete(self, window, modules, file, choice):
         """
         Delete functionality
         """

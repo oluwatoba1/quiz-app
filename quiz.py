@@ -150,15 +150,19 @@ class Quiz(Home):
         print(self.answers)
 
     def submit(self):
-        self.initialize(True, "600x500")
+        self.initialize(True, "600x600")
         score = self.compute_score()
 
-        canvas = Canvas(self.get_window(), bg="#FAFAFA", height=500, width=500)
-        canvas.configure(scrollregion=(0, 0, 550, 550))
+        frame = Frame(self.get_window(), bg="#FAFAFA")
+
+        canvas = Canvas(
+            frame, bg="#FAFAFA", height=600, width=600, scrollregion=(0, 0, 1200, 1200)
+        )
+        # canvas.configure()
         canvas_frame = Frame(canvas, bg="#FAFAFA")
         canvas.create_window((0, 0), window=canvas_frame, anchor="nw", tags="result")
 
-        scrollbar = Scrollbar(self.get_window(), command=canvas.yview)
+        scrollbar = Scrollbar(frame, command=canvas.yview)
         canvas.configure(yscrollcommand=scrollbar.set)
 
         scrollbar.pack(side="right", fill="y")
@@ -195,10 +199,10 @@ class Quiz(Home):
                 font=("Arial", 16),
             ).pack()
 
-            # question_group = Frame(master=canvas_frame, pady=20, padx=10, bg="#FAFAFA")
+            question_group = Frame(master=canvas_frame, pady=20, padx=10, bg="#FAFAFA")
             # The question itself
             Label(
-                master=canvas_frame,
+                master=question_group,
                 text=question["question"],
                 bg="#FAFAFA",
                 wraplength=500,
@@ -211,7 +215,7 @@ class Quiz(Home):
 
             # options and user choice(s)
             generate_quiz_options(
-                canvas_frame,
+                question_group,
                 question_type,
                 choices,
                 command=None,
@@ -222,13 +226,13 @@ class Quiz(Home):
             # Answer explanation
             explanation = self.get_explanation(question, answers)
             Label(
-                master=canvas_frame,
+                master=question_group,
                 text=explanation,
                 bg="#FAFAFA",
                 wraplength=500,
                 justify=LEFT,
             ).pack()
-            # question_group.pack(fill=X)
+            question_group.pack(fill=X)
             index += 1
 
         # Back button
@@ -238,9 +242,9 @@ class Quiz(Home):
             command=lambda: self.launch(
                 self.module, self.question, self.show_quiz_categories, rebuild=True
             ),
-        )
+        ).pack()
 
-        canvas.configure(scrollregion=(0, 0, 1000, 1000))
+        canvas.configure(scrollregion=(0, 0, 1200, 1200))
 
     def mark_questions(self):
         index = 0

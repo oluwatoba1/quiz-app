@@ -428,7 +428,7 @@ class Question(Home):
                 m,
                 "Select module to view available questions",
                 self.show_related_questions,
-                lambda: self.show_section(self.mc),
+                lambda: self.show_section(self.mc, self.qz),
                 delete=delete,
             )
 
@@ -518,4 +518,4 @@ class Question(Home):
         lbl_notify.pack()
 
         window.after(2000, window.destroy)
-        self.show_section(self.mc)
+        self.show_section(self.mc, self.qz)

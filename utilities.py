@@ -52,7 +52,6 @@ def generate_quiz_options(
             else:
                 if choice in answers:
                     print("yes radio")
-                    print(type(choice))
                     # radiobutton.select()
                     v.set(choice)
 
