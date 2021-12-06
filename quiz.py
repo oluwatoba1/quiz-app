@@ -156,9 +156,8 @@ class Quiz(Home):
         frame = Frame(self.get_window(), bg="#FAFAFA")
 
         canvas = Canvas(
-            frame, bg="#FAFAFA", height=600, width=600, scrollregion=(0, 0, 1200, 1200)
+            frame, bg="#FAFAFA", height=600, width=600, scrollregion=(0, 0, 1500, 1500)
         )
-        # canvas.configure()
         canvas_frame = Frame(canvas, bg="#FAFAFA")
         canvas.create_window((0, 0), window=canvas_frame, anchor="nw", tags="result")
 
@@ -244,7 +243,7 @@ class Quiz(Home):
             ),
         ).pack()
 
-        canvas.configure(scrollregion=(0, 0, 1200, 1200))
+        frame.pack()
 
     def mark_questions(self):
         index = 0
