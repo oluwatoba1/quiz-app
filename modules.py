@@ -213,24 +213,44 @@ class Module(Home):
         """
         Delete functionality
         """
+        with open("assets/questions.json", "r+") as q:
+            form_notify = Frame(master=window, pady=10, bg="#FAFAFA")
+            # notifier
+            lbl_notify = Label(
+                master=form_notify,
+                foreground="black",
+                bg="#FAFAFA",
+                font=("Arial", 14),
+            )
+            try:
+                questions = json.load(q)
+            except:
+                questions = []
+            module = modules[choice - 1]
+            module_questions = list(
+                filter(lambda question: question["module"] == module["code"], questions)
+            )
+            if len(module_questions) > 0:
+                print("has questions")
+                lbl_notify.config(text="Deletion failed, module has questions")
+            else:
+                del modules[choice - 1]
+                file.seek(0)
+                json.dump(modules, file)
+                file.truncate()
 
-        del modules[choice - 1]
-        file.seek(0)
-        json.dump(modules, file)
-        file.truncate()
-        form_notify = Frame(master=window, pady=10, bg="#FAFAFA")
+                # notifier
+                # lbl_notify = Label(
+                #     master=form_notify,
+                #     text="Module deleted",
+                #     foreground="black",
+                #     bg="#FAFAFA",
+                #     font=("Arial", 16),
+                # )
+                lbl_notify.config(text="Module deleted")
 
-        # notifier
-        lbl_notify = Label(
-            master=form_notify,
-            text="Module deleted",
-            foreground="black",
-            bg="#FAFAFA",
-            font=("Arial", 16),
-        )
+            form_notify.pack()
+            lbl_notify.pack()
 
-        form_notify.pack()
-        lbl_notify.pack()
-
-        window.after(2000, window.destroy)
-        self.show_section()
+            window.after(3000, window.destroy)
+            self.show_section()
