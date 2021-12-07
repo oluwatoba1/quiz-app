@@ -5,9 +5,9 @@ from tkinter import *
 from utilities import *
 
 from home import Home
+from result import Result
 
-
-class Quiz(Home):
+class Quiz(Home, Result):
 
     session_questions = []
     answers = []

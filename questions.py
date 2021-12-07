@@ -1,4 +1,4 @@
-import json
+import random, string, json
 from tkinter import *
 
 from home import Home
@@ -58,6 +58,9 @@ class Question(Home):
     mc = None
     module = None
     qz = None
+
+    save_count = 0
+    question_index = None
 
     def show_section(self, mc, qz):
         self.initialize(rebuild=True)
@@ -119,7 +122,7 @@ class Question(Home):
 
     def add_or_update_question(self, question=None):
         save_command = self.save
-        self.initialize(rebuild=True)
+        self.initialize(rebuild=True, window_size="600x650")
         with open("assets/modules.json", "r+") as m:
             modules = json.load(m)
             index = 0
@@ -135,8 +138,8 @@ class Question(Home):
 
             frame = Frame(self.get_window(), bg="#FAFAFA")
 
-            self.canvas = Canvas(frame, bg="#FAFAFA", height=500, width=500)
-            self.canvas.configure(scrollregion=(0, 0, 550, 550))
+            self.canvas = Canvas(frame, bg="#FAFAFA", height=650, width=600)
+            self.canvas.configure(scrollregion=(0, 0, 700, 700))
             canvas_frame = Frame(self.canvas, bg="#FAFAFA")
             self.canvas.create_window(
                 (0, 0), window=canvas_frame, anchor="nw", tags="frame"
@@ -314,7 +317,7 @@ class Question(Home):
             form_notify.pack(fill=BOTH)
             self.lbl_notify.pack()
 
-            self.canvas.configure(scrollregion=(0, 0, 550, 550))
+            self.canvas.configure(scrollregion=(0, 0, 700, 700))
 
     def validate_and_save(self, save_data, question_type, questions, q, index):
         message = "Question created successfully!"
@@ -373,9 +376,17 @@ class Question(Home):
                 json.dump(questions, q)
                 q.truncate()
 
+            self.save_count = 0
             self.notify(self.lbl_notify, message)
 
     def save(self, index=None):
+        """
+        check if save attempt limit has been exceeded in the case where
+        generated question id already exists 
+        """
+        if self.save_count == 5:
+            self.notify(self.lbl_notify, "save attempt limit exceeded, contact admin")
+            return None
         with open("assets/questions.json", "r+") as q:
             try:
                 questions = json.load(q)
@@ -411,7 +422,18 @@ class Question(Home):
             question_score = self.ent_score.get()
             answer_explanation = self.ent_explanation.get()
 
+            question_id = "".join(
+                    random.choices(string.ascii_uppercase + string.digits, k=5)
+                )
+
+            ids = len(list(filter(lambda question: question["id"] == question_id, questions)))
+            if ids > 0:
+                self.question_index = index
+                self.save_count += 1
+                self.save(self.question_index)
+
             save_data = {
+                "id": question_id,
                 "module": module,
                 "question": question.strip(),
                 "question_type": question_type,
