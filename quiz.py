@@ -156,7 +156,7 @@ class Quiz(Home):
         frame = Frame(self.get_window(), bg="#FAFAFA")
 
         canvas = Canvas(
-            frame, bg="#FAFAFA", height=600, width=600, scrollregion=(0, 0, 1500, 1500)
+            frame, bg="#FAFAFA", height=600, width=600, scrollregion=(0, 0, 1000, 1000)
         )
         canvas_frame = Frame(canvas, bg="#FAFAFA")
         canvas.create_window((0, 0), window=canvas_frame, anchor="nw", tags="result")
@@ -167,20 +167,20 @@ class Quiz(Home):
         scrollbar.pack(side="right", fill="y")
         canvas.pack(side=BOTTOM, anchor=NW, fill="y", expand=True)
 
-        header = Label(
+        Label(
             canvas_frame,
             text="Result",
             foreground="black",
             font=("Arial", 20),
         ).pack()
-        header = Label(
+        Label(
             canvas_frame,
             text=self.display_result_reaction(),
             bg="#FAFAFA",
             foreground="black",
             font=("Arial", 16),
         ).pack()
-        result = Label(
+        Label(
             canvas_frame,
             text=f"Your score is: {score}",
             bg="#FAFAFA",
@@ -202,25 +202,25 @@ class Quiz(Home):
             # The question itself
             Label(
                 master=question_group,
-                text=question["question"],
+                text=f"{question['question']} ({question['score']} points)",
                 bg="#FAFAFA",
                 wraplength=500,
                 justify=LEFT,
             ).pack()
 
-            question_type = question["question_type"]
-            choices = question["choices"]
+            # question_type = question["question_type"]
+            # choices = question["choices"]
             answers = self.answers[index - 1]
 
             # options and user choice(s)
-            generate_quiz_options(
-                question_group,
-                question_type,
-                choices,
-                command=None,
-                disabled=True,
-                answers=answers,
-            )
+            # generate_quiz_options(
+            #     question_group,
+            #     question_type,
+            #     choices,
+            #     command=None,
+            #     disabled=True,
+            #     answers=answers,
+            # )
 
             # Answer explanation
             explanation = self.get_explanation(question, answers)
@@ -235,7 +235,7 @@ class Quiz(Home):
             index += 1
 
         # Back button
-        btn_back = Button(
+        Button(
             master=canvas_frame,
             text="Back to Home",
             command=lambda: self.launch(

@@ -377,7 +377,10 @@ class Question(Home):
 
     def save(self, index=None):
         with open("assets/questions.json", "r+") as q:
-            questions = json.load(q) or []
+            try:
+                questions = json.load(q)
+            except:
+                questions = []
             module = self.MODULE_OPTIONS[self.module_selected.get()] or ""
             question = self.txt_question.get("1.0", END)
             question_type = ""
@@ -422,7 +425,10 @@ class Question(Home):
 
     def show_modules(self, delete=False):
         with open("assets/modules.json", "r+") as m:
-            modules = json.load(m)
+            try:
+                modules = json.load(m)
+            except:
+                modules = []
             self.list_items(
                 modules,
                 m,
@@ -437,7 +443,10 @@ class Question(Home):
     ):
         self.module = module
         with open("assets/questions.json", "r+") as q:
-            questions = json.load(q)
+            try:
+                questions = json.load(q)
+            except:
+                questions = []
             index = 0
             filtered_questions = []
 

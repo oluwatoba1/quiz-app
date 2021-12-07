@@ -10,30 +10,32 @@ def generate_quiz_options(
     random.shuffle(choices)
     index = 0
     for choice in choices:
-        chkValue = BooleanVar()
-        chkValue.set(False)
+        chkValue = IntVar(value=0)
+        # chkValue.set(False)
         if question_type == "MCQ":
             if not disabled:
                 Checkbutton(
                     choice_group,
                     text=choice,
-                    var=chkValue,
+                    variable=chkValue,
                     bg="#FAFAFA",
                     highlightthickness=0,
                     command=lambda choice=choice: command(choice, True),
                 ).grid(row=index, column=0, sticky="w")
             else:
+                if choice in answers:
+                    chkValue = IntVar(value=1)
+                    # checkbutton.select()
+
                 checkbutton = Checkbutton(
                     choice_group,
                     text=choice,
-                    var=chkValue,
+                    variable=chkValue,
+                    onvalue=1,
+                    offvalue=0,
                     bg="#FAFAFA",
                     highlightthickness=0,
                 )
-
-                if choice in answers:
-                    print("yes checky")
-                    checkbutton.select()
 
                 checkbutton.configure(state=DISABLED)
                 checkbutton.grid(row=index, column=0, sticky="w")
@@ -44,14 +46,13 @@ def generate_quiz_options(
                     choice_group,
                     text=choice,
                     value=choice,
-                    variable=v,
                     bg="#FAFAFA",
                     highlightthickness=0,
                     command=lambda choice=choice: command(choice),
                 ).grid(row=index, column=0, sticky="w")
             else:
+
                 if choice in answers:
-                    print("yes radio")
                     # radiobutton.select()
                     v.set(choice)
 
@@ -63,7 +64,8 @@ def generate_quiz_options(
                     bg="#FAFAFA",
                     highlightthickness=0,
                     state=DISABLED,
-                ).grid(row=index, column=0, sticky="w")
+                )
+                radiobutton.grid(row=index, column=0, sticky="w")
 
         index += 1
     choice_group.pack(fill=X)

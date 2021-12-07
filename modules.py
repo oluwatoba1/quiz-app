@@ -119,7 +119,10 @@ class Module(Home):
         Save module functionality
         """
         with open("assets/modules.json", "r+") as m:
-            modules = json.load(m)
+            try:
+                modules = json.load(m)
+            except:
+                modules = []
 
             exist = self.find_module(modules, code.get())
 
