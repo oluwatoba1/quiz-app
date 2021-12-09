@@ -19,6 +19,7 @@ class Quiz(Home):
     module = None
     question = None
     module_code = None
+    lbl_notify = None
 
     def show_quiz_categories(self, module, question, isReport=False):
         self.module_model = module
@@ -33,7 +34,7 @@ class Quiz(Home):
                             module_code=module_code
                         )
                 if isReport:
-                    command = self.show_report
+                    command = lambda module_code=module["code"]: self.show_report(module_code)
 
                 options.append(
                     {
@@ -228,7 +229,7 @@ class Quiz(Home):
         # Back button
         Button(
             master=canvas_frame,
-            text="Back to Home",
+            text="Back",
             command=lambda: self.launch(
                 self.module, self.question, self.show_quiz_categories, rebuild=True
             ),
@@ -336,15 +337,108 @@ class Quiz(Home):
 
         return None
 
-    def show_report(self):
-        with open("assets/modules.json") as m, open("assets/results.json") as r:
+    def show_report(self, module_code):
+        self.initialize(rebuild=True, window_size="700x550")
+        with open("assets/results.json") as r, open("assets/questions.json") as q:
             try:
-                modules = json.load(m)
                 results = json.load(r)
+                questions = json.load(q)
             except:
                 self.launch(
                     self.module, self.question, self.show_quiz_categories, rebuild=True
                 )
-            print("fetching report...")
+            
+            total_quizzes = len(list(filter(lambda result: result["module"] == module_code, results)))
+            scores_list = [result["total_score"] for result in results]
+            total_score = 0
+            average_score = 0
+            count = 0
+            for score in scores_list:
+                total_score += score
+                count += 1
+            average_score = int(round(total_score / count))
 
+            max_score = max(scores_list)
+            min_score = min(scores_list)
+
+
+            module_questions = list(filter(lambda question: question["module"] == module_code, questions))
+            module_questions.sort(key=lambda q: q.get("answered_count"), reverse=True)
+            frequent_questions = [question["question"] for question in module_questions[:2]]
+
+            Label(self.get_window(), text='Quizzer Report', font=('Helvetica', 20, 'bold')).pack()
+
+            frame1 = Frame(self.get_window(), pady=20, padx=10, bg="#FAFAFA")
+            frame2 = Frame(self.get_window(), pady=20, padx=10, bg="#FAFAFA")
+            frame3 = Frame(self.get_window(), pady=20, padx=10, bg="#FAFAFA")
+            frame_action = Frame(self.get_window(), pady=20, padx=10, bg="#FAFAFA")
+            frame_notify = Frame(self.get_window(), pady=20, padx=10, bg="#FAFAFA")
+
+            # Number of quizzes taken
+            Label(frame1, text="Number of quizzes taken: ", font=("Arial", 16, "bold"), bg="#FAFAFA").grid(row=0, column=0, sticky="w")
+            Label(frame1, text=total_quizzes, font=("Arial", 16), bg="#FAFAFA").grid(row=0, column=1, sticky="e")
+
+            # Scores
+            Label(frame2, text="Average Score: ", font=("Arial", 16, "bold"), bg="#FAFAFA").grid(row=0, column=0, sticky="w")
+            Label(frame2, text=average_score, font=("Arial", 16), bg="#FAFAFA").grid(row=0, column=1, sticky="e")
+
+            Label(frame2, text="Highest Score: ", font=("Arial", 16, "bold"), bg="#FAFAFA").grid(row=1, column=0, sticky="w")
+            Label(frame2, text=max_score, font=("Arial", 16), bg="#FAFAFA").grid(row=1, column=1, sticky="e")
+
+            Label(frame2, text="Lowest Score: ", font=("Arial", 16, "bold"), bg="#FAFAFA").grid(row=2, column=0, sticky="w")
+            Label(frame2, text=min_score, font=("Arial", 16), bg="#FAFAFA").grid(row=2, column=1, sticky="e")
+
+            # Most frequent questions
+            Label(frame3, text="Most Frequent Questions: ", font=("Arial", 16, "bold"), bg="#FAFAFA").grid(row=0, column=0, sticky="w")
+            Label(frame3, text=f"1. {frequent_questions[0]}", font=("Arial", 16), bg="#FAFAFA", wraplength=680, justify=LEFT).grid(row=1, column=0, sticky="w")
+            Label(frame3, text=f"2. {frequent_questions[1]}", font=("Arial", 16), bg="#FAFAFA", wraplength=680, justify=LEFT).grid(row=2, column=0, sticky="w")
+
+            data = dict(total_quizzes=total_quizzes, average_score=average_score, max_score=max_score, min_score=min_score, frequent_questions=frequent_questions)
+
+            # Back button
+            back_btn = Button(
+                master=frame_action,
+                text="Back to Modules",
+                command=lambda: self.show_quiz_categories(
+                    self.module, self.question, isReport=True
+                ),
+            )
+
+            # Export button
+            export_btn = Button(
+                master=frame_action,
+                text="Export",
+                command=lambda: self.export_report(**data),
+            )
+
+            # notifier
+            self.lbl_notify = Label(
+                master=frame_notify,
+                text="",
+                foreground="black",
+                bg="#FAFAFA",
+                font=("Arial", 12),
+            )
+
+            frame1.pack(fill=X)
+            frame2.pack(fill=X)
+            frame3.pack(fill=X)
+            back_btn.grid(row=0, column=0, sticky="w")
+            export_btn.grid(row=0, column=1, sticky="e")
+            frame_action.pack(fill=X)
+            frame_notify.pack(fill=X)
+            self.lbl_notify.pack()
+
+    def export_report(self, **kwargs):
+        with open("assets/report.txt", "w+") as report:
+            report.write(f"Number of quizzes taken: {kwargs['total_quizzes']} \n")
+            report.write("\n")
+            report.write(f"Average score: {kwargs['average_score']} \n")
+            report.write(f"Highest score: {kwargs['max_score']} \n")
+            report.write(f"Lowest score: {kwargs['min_score']} \n")
+            report.write("\n")
+            report.write("Top 2 most frequent questions: \n")
+            report.write(f"{kwargs['frequent_questions'][0]} \n")
+            report.write(f"{kwargs['frequent_questions'][1]} \n")
+        self.notify(self.lbl_notify, "Exported successfully!")
             

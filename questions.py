@@ -152,9 +152,6 @@ class Question(Home):
             self.canvas.pack(side=BOTTOM, anchor=NW, fill="both", expand=True)
             frame.pack(anchor=W, fill="x")
 
-            # self.canvas.create_line(0, 0, 500, 1000)
-            # self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-
             Label(
                 master=canvas_frame, text=text, foreground="black", font=("Arial", 16)
             ).pack()

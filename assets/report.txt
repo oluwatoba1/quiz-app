@@ -1,0 +1,9 @@
+Number of quizzes taken: 3 
+
+Average score: 83 
+Highest score: 100 
+Lowest score: 62 
+
+Top 2 most frequent questions: 
+Which of this is not a valid data type in python 
+How do you destructure an object in Javascript? 
