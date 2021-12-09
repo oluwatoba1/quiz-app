@@ -1,13 +1,13 @@
 import random
 import json
+from datetime import datetime
 
 from tkinter import *
 from utilities import *
 
 from home import Home
-from result import Result
 
-class Quiz(Home, Result):
+class Quiz(Home):
 
     session_questions = []
     answers = []
@@ -18,21 +18,27 @@ class Quiz(Home, Result):
     total_score = 0
     module = None
     question = None
+    module_code = None
 
-    def show_quiz_categories(self, module, question):
+    def show_quiz_categories(self, module, question, isReport=False):
         self.module_model = module
         self.question_model = question
         self.initialize(rebuild=True)
+    
         with open("assets/modules.json", "r+") as m:
             modules = json.load(m)
             options = []
             for module in modules:
+                command = lambda module_code=module["code"]: self.play(
+                            module_code=module_code
+                        )
+                if isReport:
+                    command = self.show_report
+
                 options.append(
                     {
                         "text": module["name"],
-                        "command": lambda module_code=module["code"]: self.play(
-                            module_code=module_code
-                        ),
+                        "command": command,
                     }
                 )
             options.append(
@@ -47,25 +53,8 @@ class Quiz(Home, Result):
             self.show_options(options, header="Select Test Module")
 
     def play(self, module_code):
-        # print("\n==========QUIZ START==========")
-        # score = 0
-        # with open("assets/questions.json", "r+") as q:
-        #     j = json.load(f)
-        #     for i in range(10):
-        #         no_of_questions = len(j)
-        #         ch = random.randint(0, no_of_questions - 1)
-        #         print(f'\nQ{i+1} {j[ch]["question"]}\n')
-        #         for option in j[ch]["options"]:
-        #             print(option)
-        #         answer = input("\nEnter your answer: ")
-        #         if j[ch]["answer"][0] == answer[0].upper():
-        #             print("\nYou are correct")
-        #             score += 1
-        #         else:
-        #             print("\nYou are incorrect"
-        #         del j[ch]
-        #     print(f"\nFINAL SCORE: {score}/10")
-        for i in range(5):
+        self.module_code = module_code
+        for _ in range(5):
             self.answers.append([])
         print(self.answers)
         self.initialize(rebuild=True, window_size="500x400")
@@ -152,6 +141,8 @@ class Quiz(Home, Result):
     def submit(self):
         self.initialize(True, "600x600")
         score = self.compute_score()
+        self.update_questions()
+        self.save_result()
 
         frame = Frame(self.get_window(), bg="#FAFAFA")
 
@@ -302,3 +293,58 @@ class Quiz(Home, Result):
 
         explanation = prefix + suffix + is_correct_str + ". " + question["explanation"]
         return explanation
+
+    def update_questions(self):
+        with open("assets/questions.json", "r+") as q:
+            try:
+                questions = json.load(q)
+            except:
+                questions = []
+            
+            for sq in self.session_questions:
+                for question in questions:
+                    if question["id"] == sq["id"]:
+                        question["answered_count"] += 1
+                        break
+
+            q.seek(0)
+            json.dump(questions, q)
+            q.truncate()
+    
+    def save_result(self):
+        # module code
+        # total score
+        # date
+        with open("assets/results.json", "r+") as r:
+            try:
+                results = json.load(r)
+            except:
+                results = []
+
+            save_data = {
+                "module": self.module_code,
+                "total_score": int(round(self.score/self.total_score * 100)),
+                "date": datetime.now().strftime("%d-%m-%Y")
+            }
+
+            results.append(save_data)
+
+            r.seek(0)
+            json.dump(results, r)
+            r.truncate()
+
+
+        return None
+
+    def show_report(self):
+        with open("assets/modules.json") as m, open("assets/results.json") as r:
+            try:
+                modules = json.load(m)
+                results = json.load(r)
+            except:
+                self.launch(
+                    self.module, self.question, self.show_quiz_categories, rebuild=True
+                )
+            print("fetching report...")
+
+            

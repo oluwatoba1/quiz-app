@@ -49,9 +49,10 @@ class Home:
         """
         self.initialize(rebuild)
         options = [
-            {"text": "Take Quiz", "command": lambda: quiz(module, question)},
             {"text": "Module", "command": module},
             {"text": "Questions", "command": lambda: question(module, quiz)},
+            {"text": "Take Quiz", "command": lambda: quiz(module, question)},
+            {"text": "Generate Report", "command": lambda: quiz(module, question, isReport=True)},
             {"text": "Exit", "command": None},
         ]
         self.show_options(options)

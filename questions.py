@@ -441,6 +441,7 @@ class Question(Home):
                 "answers": answers,
                 "score": question_score,
                 "explanation": answer_explanation,
+                "answered_count": 0
             }
 
             self.validate_and_save(save_data, question_type, questions, q, index)

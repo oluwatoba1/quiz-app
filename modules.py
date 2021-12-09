@@ -54,7 +54,10 @@ class Module(Home):
         index = None
         module = None
         self.initialize(rebuild=True)
-        Label(text="Add Module", foreground="black", font=("Arial", 16)).pack()
+        text = "Add Module"
+        if len(kwargs) > 0:
+            text = "Update Module"
+        Label(text=text, foreground="black", font=("Arial", 16)).pack()
         form_group = Frame(master=self.get_window(), pady=20, padx=10, bg="#FAFAFA")
         form_action = Frame(master=self.get_window(), pady=20, padx=10, bg="#FAFAFA")
         form_notify = Frame(master=self.get_window(), pady=10, padx=10, bg="#FAFAFA")
@@ -226,28 +229,20 @@ class Module(Home):
                 questions = json.load(q)
             except:
                 questions = []
-            module = modules[choice - 1]
-            module_questions = list(
-                filter(lambda question: question["module"] == module["code"], questions)
-            )
-            if len(module_questions) > 0:
-                print("has questions")
-                lbl_notify.config(text="Deletion failed, module has questions")
-            else:
-                del modules[choice - 1]
-                file.seek(0)
-                json.dump(modules, file)
-                file.truncate()
 
-                # notifier
-                # lbl_notify = Label(
-                #     master=form_notify,
-                #     text="Module deleted",
-                #     foreground="black",
-                #     bg="#FAFAFA",
-                #     font=("Arial", 16),
-                # )
-                lbl_notify.config(text="Module deleted")
+            # remove questions related with module
+            questions = [question for question in questions if question["module"] != modules[choice - 1]["code"]]
+            q.seek(0)
+            json.dump(questions, q)
+            q.truncate()
+
+            # delete module
+            del modules[choice - 1]
+            file.seek(0)
+            json.dump(modules, file)
+            file.truncate()
+                
+            lbl_notify.config(text="Module deleted")
 
             form_notify.pack()
             lbl_notify.pack()
