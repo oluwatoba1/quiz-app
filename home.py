@@ -35,7 +35,6 @@ class Home:
         widget_list = self.all_children()
         for item in widget_list:
             item.pack_forget()
-        # self._window = Tk(className="QUIZZER")
 
     def initialize(self, rebuild=False, window_size="550x500"):
         if rebuild:
