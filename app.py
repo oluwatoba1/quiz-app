@@ -1,7 +1,3 @@
-import json
-import random
-import getpass
-
 from tkinter import *
 
 from home import Home
@@ -22,4 +18,3 @@ if __name__ == "__main__":
     quiz_section = Quiz(window).show_quiz_categories
 
     home.launch(module_section, question_section, quiz_section)
-N

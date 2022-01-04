@@ -374,6 +374,12 @@ class Quiz(Home):
             frame_action = Frame(self.get_window(), pady=20, padx=10, bg="#FAFAFA")
             frame_notify = Frame(self.get_window(), pady=20, padx=10, bg="#FAFAFA")
 
+            # No report available
+            if len(frequent_questions) < 2:
+                Label(frame1, text="No report available for this module!", font=("Arial", 16, "bold"), bg="#FAFAFA").grid(row=0, column=0, sticky="w")
+                frame1.pack(fill=X)
+                return
+
             # Number of quizzes taken
             Label(frame1, text="Number of quizzes taken: ", font=("Arial", 16, "bold"), bg="#FAFAFA").grid(row=0, column=0, sticky="w")
             Label(frame1, text=total_quizzes, font=("Arial", 16), bg="#FAFAFA").grid(row=0, column=1, sticky="e")
