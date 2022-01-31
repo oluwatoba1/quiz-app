@@ -15,6 +15,7 @@ class Home:
         self.label = None
         self.module_class = None
         self.question_class = None
+        self.page_notify = None
 
     def get_window(self):
         return self._window
@@ -90,6 +91,14 @@ class Home:
                 command=option["command"] or self._window.destroy,
                 wraplength=400,
             ).pack()
+        
+        lbl_notify = Label(
+            master=canvas_frame,
+            text="",
+            foreground="black",
+            bg="#FAFAFA",
+            font=("Arial", 12),
+        )
 
         self._window.mainloop()
 

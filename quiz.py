@@ -57,18 +57,30 @@ class Quiz(Home):
         self.module_code = module_code
         for _ in range(5):
             self.answers.append([])
-        print(self.answers)
-        self.initialize(rebuild=True, window_size="500x400")
         with open("assets/questions.json", "r+") as q:
             questions = json.load(q)
             module_questions = list(
                 filter(lambda question: question["module"] == module_code, questions)
             )
-            self.session_questions = random.sample(module_questions, 5)
-            print("####questions####")
-            print(self.session_questions)
+            if len(module_questions) >= 5:
+                self.initialize(rebuild=True, window_size="500x400")
+                self.session_questions = random.sample(module_questions, 5)
+                self.display_current_question()
 
-            self.display_current_question()
+            else: self.show_error()
+
+    def show_error(self):
+        window = Tk(className="Error")
+        window.configure(background="#FAFAFA")
+
+        Label(
+            master=window,
+            text="You do not have enough questions in this module to take a quiz",
+            foreground="black",
+            font=("Arial", 14),
+        ).pack()
+
+        window.mainloop()
 
     def show_question(self, page=None):
         if page is None:

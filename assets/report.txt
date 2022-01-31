@@ -1,9 +1,9 @@
-Number of quizzes taken: 3 
+Number of quizzes taken: 4 
 
-Average score: 83 
+Average score: 85 
 Highest score: 100 
 Lowest score: 62 
 
 Top 2 most frequent questions: 
 Which of this is not a valid data type in python 
-How do you destructure an object in Javascript? 
+Tkinter is a programming language 
